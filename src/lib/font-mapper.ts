@@ -21,7 +21,9 @@ function initFontInfoMap() {
 
   const data = fontMappingData as { 
     字体数据: Array<{ 
+      文件名: string;
       字体信息: Array<{ 
+        子字体索引: number;
         中文标准命名: string; 
         '技术命名(nameID=6)': string;
         下载地址?: string;
@@ -31,13 +33,15 @@ function initFontInfoMap() {
   };
   
   for (const fontItem of data.字体数据) {
+    // 文件名去除扩展名，作为中文名缺省回退值
+    const fileBaseName = fontItem.文件名.replace(/\.[^.]+$/, '');
     for (const info of fontItem.字体信息) {
-      const chineseName = info.中文标准命名;
+      const chineseName = info.中文标准命名 || fileBaseName;
       const technicalNames = info['技术命名(nameID=6)'];
       const downloadUrl = info.下载地址 || '';
       const license = info.授权标准 || '';
       
-      if (technicalNames && chineseName) {
+      if (technicalNames) {
         // 技术命名可能是逗号分隔的多个名称
         const names = technicalNames.split(',').map(n => n.trim());
         for (const name of names) {
